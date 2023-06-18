@@ -1,0 +1,26 @@
+# Terraform files
+**/*.tfstate
+**/*.tfstate.backup
+**/.terraform
+
+# Local environment files
+.venv/
+
+# Build files
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Dependency directories
+lambda_function/src/
+
+# IDE files
+.vscode/
+.idea/
+
+# Log files
+*.log
+
+# Other generated files
+*.zip
