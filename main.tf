@@ -30,10 +30,12 @@ variable "lambda_handler" {}
 variable "lambda_timeout" {}
 variable "lambda_memory_size" {}
 variable "lambda_function_code_path" {}
+variable "account_id" {}
 
 # Carga los valores de las variables del archivo .tfvars como variables locales
 locals {
   region                    = var.region
+  account_id                = var.account_id
   api_name                  = var.api_name
   api_description           = var.api_description
   api_stage_name            = var.api_stage_name
@@ -54,6 +56,8 @@ module "api_gateway" {
   api_name         = var.api_name
   api_description  = var.api_description
   api_stage_name   = var.api_stage_name
+  region           = var.region
+  account_id       = var.account_id
   lambda_function_arn = module.lambda_function.lambda_function_arn
 }
 

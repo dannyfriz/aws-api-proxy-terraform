@@ -14,20 +14,6 @@ resource "aws_api_gateway_method" "proxy_method" {
   resource_id   = aws_api_gateway_resource.proxy_resource.id
   http_method   = "ANY"
   authorization = "NONE"
-
-  response {
-    status_code = "200"
-    response_models = {
-      "application/json" = "Empty"
-    }
-  }
-
-  response {
-    status_code = "400"
-    response_models = {
-      "application/json" = "Empty"
-    }
-  }
 }
 
 resource "aws_api_gateway_integration" "proxy_integration" {
@@ -35,22 +21,22 @@ resource "aws_api_gateway_integration" "proxy_integration" {
   resource_id             = aws_api_gateway_resource.proxy_resource.id
   http_method             = aws_api_gateway_method.proxy_method.http_method
   integration_http_method = "ANY"
-  type                    = "AWS"
+  type                    = "AWS_PROXY"
   uri                     = var.lambda_function_arn
 
   request_templates = {
     "application/json" = <<EOF
 {
-  "body": $input.json("$"),
+  "body": "$input.json('$')",
   "headers": {
     #foreach($param in $input.params().header.keySet())
-    "$param": "$util.escapeJavaScript($input.params().header.get($param))" #if($foreach.hasNext),#end
+    "$param": "$util.escapeJavaScript($input.params().header.get($param))"#if($foreach.hasNext),#end
     #end
   },
   "method": "$context.httpMethod",
   "query": {
     #foreach($param in $input.params().querystring.keySet())
-    "$param": "$util.escapeJavaScript($input.params().querystring.get($param))" #if($foreach.hasNext),#end
+    "$param": "$util.escapeJavaScript($input.params().querystring.get($param))"#if($foreach.hasNext),#end
     #end
   },
   "path": "$context.resourcePath",
@@ -75,10 +61,10 @@ resource "aws_api_gateway_integration" "proxy_integration" {
   }
 }
 EOF
-  }
 }
-
+}
 resource "aws_api_gateway_deployment" "api_deployment" {
+  depends_on  = [aws_api_gateway_integration.proxy_integration]
   rest_api_id = aws_api_gateway_rest_api.api.id
   stage_name  = var.api_stage_name
 }
@@ -93,7 +79,7 @@ resource "aws_api_gateway_rest_api_policy" "api_policy" {
       "Effect": "Allow",
       "Principal": "*",
       "Action": "execute-api:Invoke",
-      "Resource": "arn:aws:execute-api:${var.aws_region}:500550120692:${aws_api_gateway_rest_api.api.id}/*"
+      "Resource": "arn:aws:execute-api:${var.region}:${var.account_id}:${aws_api_gateway_rest_api.api.id}/*"
     }
   ]
 }

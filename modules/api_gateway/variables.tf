@@ -17,3 +17,13 @@ variable "lambda_function_arn" {
   description = "ARN de la función Lambda"
   type        = string
 }
+
+variable "region" {
+  description = "Region de la Cuenta de AWS"
+  type        = string
+}
+
+variable "account_id" {
+  description = "Id de la Cuenta de AWS"
+  type        = string
+}
