@@ -1,4 +1,5 @@
 import boto3
+import json
 
 def lambda_handler(event, context):
     try:
@@ -9,6 +10,19 @@ def lambda_handler(event, context):
         path = event['path']
         http_method = event['httpMethod']
         source_ip = event['requestContext']['identity']['sourceIp']
+        
+        if path == '/health' and http_method == 'GET':
+            print("Request received for /health")
+            print({
+                "logMessage": "Health Check",
+                "sourceIp": source_ip,
+                "path": path,
+                "httpMethod": http_method
+            })
+            return {
+                "statusCode": 200,
+                "body": "Health Check OK. He alcanzado a la lambda."
+            }
         
         print(f"Proxy Request: {http_method} {path}")
         
@@ -63,3 +77,10 @@ def save_request_statistics(source_ip, path, http_method):
     # Registrar información de origen, ruta y método HTTP en la tabla DynamoDB
     # para su posterior análisis y visualización
     print(f"Request Statistics: {source_ip}, {path}, {http_method}")
+
+# Configuración para imprimir mensajes en formato JSON en CloudWatch
+def json_print(message):
+    print(json.dumps(message))
+
+# Reemplazar la función print por json_print en la función lambda_handler
+print = json_print

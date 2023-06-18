@@ -69,6 +69,8 @@ module "lambda_function" {
   lambda_timeout            = var.lambda_timeout
   lambda_memory_size        = var.lambda_memory_size
   lambda_function_code_path = var.lambda_function_code_path
+  api_gateway_arn           = module.api_gateway.api_gateway_arn
+  region                    = var.region
 }
 
 module "dynamodb" {
