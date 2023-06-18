@@ -1,33 +1,29 @@
-variable "function_name" {
+variable "lambda_function_name" {
   description = "Nombre de la función Lambda"
   type        = string
 }
 
-variable "runtime" {
-  description = "Entorno de ejecución de la función Lambda"
+variable "lambda_runtime" {
+  description = "Tiempo de ejecución de la función Lambda"
   type        = string
-  default     = "python3.9"
 }
 
-variable "handler" {
-  description = "Controlador (handler) de la función Lambda"
+variable "lambda_handler" {
+  description = "Controlador de la función Lambda"
   type        = string
-  default     = "lambda_function.lambda_handler"
 }
 
-variable "timeout" {
-  description = "Tiempo de espera (timeout) de la función Lambda"
+variable "lambda_timeout" {
+  description = "Tiempo de espera de la función Lambda"
   type        = number
-  default     = 10
 }
 
-variable "memory_size" {
-  description = "Tamaño de memoria de la función Lambda"
+variable "lambda_memory_size" {
+  description = "Tamaño de memoria asignado a la función Lambda"
   type        = number
-  default     = 128
 }
 
-variable "function_code_path" {
-  description = "Ruta del archivo de código de la función Lambda"
+variable "lambda_function_code_path" {
+  description = "Ruta al código de la función Lambda"
   type        = string
 }

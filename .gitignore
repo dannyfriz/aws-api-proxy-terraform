@@ -2,6 +2,8 @@
 **/*.tfstate
 **/*.tfstate.backup
 **/.terraform
+dev.tfvars
+prod.tfvars
 
 # Archivo de bloqueo de Terraform
 .terraform.lock.hcl
