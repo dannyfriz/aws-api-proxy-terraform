@@ -27,3 +27,13 @@ variable "lambda_function_code_path" {
   description = "Ruta al código de la función Lambda"
   type        = string
 }
+
+variable "api_gateway_deployment_arn" {
+  description = "ARN de la API Gateway Deployment"
+  type        = string
+}
+
+variable "aws_region" {
+  description = "Región de la cuenta de AWS"
+  type        = string
+}

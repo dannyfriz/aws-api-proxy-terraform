@@ -1,48 +1,65 @@
+import json
+import requests
 import boto3
+from botocore.signers import RequestSigner
 
-def lambda_handler(event, context):
-    # Extraer información del evento
-    path = event['path']
-    http_method = event['httpMethod']
-    source_ip = event['requestContext']['identity']['sourceIp']
+def get_api_gateway_url(event):
+    region = event['requestContext']['region']
+    api_id = event['requestContext']['apiId']
+    stage = event['requestContext']['stage']
 
-    # Verificar si la solicitud es para redirigir a api.mercadolibre.com
-    if path.startswith('/categories'):
-        # Realizar redireccionamiento a api.mercadolibre.com
-        response = proxy_request(path, http_method, source_ip)
-    else:
-        # Devolver una respuesta de error para rutas no compatibles
-        response = {
-            "statusCode": 404,
-            "body": "Route not supported"
-        }
+    url = f"https://{api_id}.execute-api.{region}.amazonaws.com/{stage}"
+    return url
 
-    return response
+def sign_request(url, region, service):
+    credentials = boto3.Session().get_credentials()
+    signer = RequestSigner(service, region, 'execute-api', 'v4', credentials)
 
-def proxy_request(path, http_method, source_ip):
-    # Crear una instancia del cliente de API Gateway para realizar la solicitud
-    api_gateway_client = boto3.client('apigatewaymanagementapi')
-
-    # Crear una solicitud de redireccionamiento a api.mercadolibre.com
-    # utilizando la ruta y el método HTTP proporcionados
-    response = api_gateway_client.post_to_connection(
-        Data=f'{http_method} {path}',
-        ConnectionId='CONNECTION_ID'  # Reemplaza CONNECTION_ID con el ID de la conexión real
+    headers = {}
+    signed_url = signer.generate_presigned_url(
+        method='GET',
+        url=url,
+        headers=headers,
+        region_name=region,
+        expires_in=60
     )
 
-    # Registrar la solicitud y guardar estadísticas de uso
-    save_request_statistics(source_ip, path, http_method)
+    return signed_url, headers
 
-    # Devolver la respuesta recibida de api.mercadolibre.com
-    return {
-        "statusCode": response['StatusCode'],
-        "body": response['Body']
-    }
+def lambda_handler(event, context):
+    print("Received event: " + json.dumps(event))
 
-def save_request_statistics(source_ip, path, http_method):
-    # Implementar la lógica para almacenar las estadísticas de uso de proxy
-    # por ejemplo, guardar los datos en una tabla de DynamoDB
+    try:
+        # Extract the category ID from the path
+        category_id = event['pathParameters']['proxy']
 
-    # Registrar información de origen, ruta y método HTTP en la tabla DynamoDB
-    # para su posterior análisis y visualización
-    pass
+        # Create the URL for the API Gateway endpoint
+        api_gateway_url = get_api_gateway_url(event)
+
+        # Sign the request for the API Gateway endpoint
+        signed_url, headers = sign_request(api_gateway_url, 'us-east-1', 'execute-api')
+
+        # Forward the request to the signed URL
+        url = f"{signed_url}/categories/{category_id}"
+        response = requests.get(url, headers=headers)
+
+        # Return the response from api
+        return {
+            'statusCode': response.status_code,
+            'body': response.text,
+            'headers': {
+                'Content-Type': response.headers.get('Content-Type')
+            }
+        }
+
+    except Exception as e:
+        print("Error:", str(e))
+
+        error_response = {
+            'statusCode': 500,
+            'body': 'An error occurred'
+        }
+
+        # Log the error response
+        print("Error Response: " + json.dumps(error_response))
+        return error_response
