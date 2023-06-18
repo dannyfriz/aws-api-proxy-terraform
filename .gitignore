@@ -3,8 +3,14 @@
 **/*.tfstate.backup
 **/.terraform
 
+# Archivo de bloqueo de Terraform
+.terraform.lock.hcl
+
 # Local environment files
 .venv/
+
+# Directorio del entorno virtual
+venv/
 
 # Build files
 *.pyc

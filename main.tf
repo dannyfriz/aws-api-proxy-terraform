@@ -1,18 +1,18 @@
+# Configuración del proveedor de AWS
 terraform {
-  required_version = ">= 1.0"
-  
-  backend "s3" {
-    bucket         = "nombre-del-bucket-s3"
-    key            = "ruta-dentro-del-bucket/terraform.tfstate"
-    region         = "us-east-1"
-    encrypt        = true
-    dynamodb_table = "nombre-de-la-tabla-dynamodb"
-    profile        = "nombre-del-perfil-de-credenciales"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 4.64.0"
+    }
   }
+
+  required_version = ">= 1.4.5"
+
 }
 
 provider "aws" {
-  region = var.aws_region
+  region = var.region
 }
 
 module "api_gateway" {
