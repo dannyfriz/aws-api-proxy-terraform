@@ -6,6 +6,7 @@ resource "aws_lambda_function" "lambda_function" {
   memory_size      = var.lambda_memory_size
 
   filename         = var.lambda_function_code_path
+  source_code_hash = filebase64sha256(var.lambda_function_code_path)
 
   role             = aws_iam_role.lambda_execution_role.arn
 }
