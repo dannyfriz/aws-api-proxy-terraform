@@ -17,12 +17,12 @@ resource "aws_api_gateway_method" "proxy_method" {
 }
 
 resource "aws_api_gateway_integration" "proxy_integration" {
-  rest_api_id          = aws_api_gateway_rest_api.api.id
-  resource_id          = aws_api_gateway_resource.proxy_resource.id
-  http_method          = aws_api_gateway_method.proxy_method.http_method
-  integration_http_method = "ANY"
-  type                 = "HTTP_PROXY"
-  uri                  = "https://api.mercadolibre.com/{proxy}"
+  rest_api_id             = aws_api_gateway_rest_api.api.id
+  resource_id             = aws_api_gateway_resource.proxy_resource.id
+  http_method             = aws_api_gateway_method.proxy_method.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = var.lambda_function_arn
 }
 
 resource "aws_api_gateway_deployment" "api_deployment" {

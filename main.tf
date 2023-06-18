@@ -54,6 +54,7 @@ module "api_gateway" {
   api_name         = var.api_name
   api_description  = var.api_description
   api_stage_name   = var.api_stage_name
+  lambda_function_arn = module.lambda_function.lambda_function_arn
 }
 
 module "lambda_function" {
