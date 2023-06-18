@@ -1,23 +1,41 @@
 import boto3
 
 def lambda_handler(event, context):
-    # Extraer información del evento
-    path = event['path']
-    http_method = event['httpMethod']
-    source_ip = event['requestContext']['identity']['sourceIp']
-
-    # Verificar si la solicitud es para redirigir a api.mercadolibre.com
-    if path.startswith('/categories'):
-        # Realizar redireccionamiento a api.mercadolibre.com
+    try:
+        # Validación de entrada
+        validate_input(event)
+        
+        # Obtener los datos necesarios de la solicitud
+        path = event['path']
+        http_method = event['httpMethod']
+        source_ip = event['requestContext']['identity']['sourceIp']
+        
+        print(f"Proxy Request: {http_method} {path}")
+        
+        # Realizar la solicitud a la API de destino
         response = proxy_request(path, http_method, source_ip)
-    else:
-        # Devolver una respuesta de error para rutas no compatibles
-        response = {
-            "statusCode": 404,
-            "body": "Route not supported"
+        
+        print(f"Proxy Response: {response['statusCode']}")
+        
+        return {
+            "statusCode": response['statusCode'],
+            "body": response['body']
+        }
+    except Exception as e:
+        # Manejo de errores específicos
+        error_message = str(e)
+        print(f"Error: {error_message}")
+        
+        return {
+            "statusCode": 500,
+            "body": f"Error: {error_message}"
         }
 
-    return response
+def validate_input(event):
+    # Implementar la validación de los campos requeridos en el evento
+    # Por ejemplo, verificar la presencia de 'path', 'httpMethod', etc.
+    if 'path' not in event or 'httpMethod' not in event:
+        raise Exception("Invalid input. 'path' and 'httpMethod' are required fields.")
 
 def proxy_request(path, http_method, source_ip):
     # Crear una instancia del cliente de API Gateway para realizar la solicitud
@@ -33,7 +51,6 @@ def proxy_request(path, http_method, source_ip):
     # Registrar la solicitud y guardar estadísticas de uso
     save_request_statistics(source_ip, path, http_method)
 
-    # Devolver la respuesta recibida de api.mercadolibre.com
     return {
         "statusCode": response['StatusCode'],
         "body": response['Body']
@@ -45,4 +62,4 @@ def save_request_statistics(source_ip, path, http_method):
 
     # Registrar información de origen, ruta y método HTTP en la tabla DynamoDB
     # para su posterior análisis y visualización
-    pass
+    print(f"Request Statistics: {source_ip}, {path}, {http_method}")
