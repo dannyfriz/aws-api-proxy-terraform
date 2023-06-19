@@ -32,6 +32,9 @@ variable "lambda_handler" {}
 variable "lambda_memory_size" {}
 variable "lambda_runtime" {}
 variable "lambda_timeout" {}
+variable "waf_acl_name" {}
+variable "waf_acl_description" {}
+variable "waf_rule_group_arn" {}
 
 # Módulo: api_gateway
 module "api_gateway" {
@@ -81,4 +84,13 @@ module "dynamodb" {
   dynamodb_read_capacity   = var.dynamodb_read_capacity
   dynamodb_table_name      = var.dynamodb_table_name
   dynamodb_write_capacity  = var.dynamodb_write_capacity
+}
+
+# Módulo: waf
+module "waf" {
+  source                    = "./modules/waf"
+  waf_acl_name              = var.waf_acl_name
+  waf_acl_description       = var.waf_acl_description
+  waf_rule_group_arn        = var.waf_rule_group_arn
+  api_gateway_execution_arn = module.api_gateway.api_gateway_execution_arn
 }

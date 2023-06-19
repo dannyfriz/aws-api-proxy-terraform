@@ -157,9 +157,12 @@ resource "aws_api_gateway_stage" "stage" {
 
   xray_tracing_enabled = true
 
+  lifecycle {
+    create_before_destroy = true
+  }
+
   access_log_settings {
     destination_arn = var.cloudwatch_log_group_arn
     format = "{\"stage\":\"$context.stage\",\"request_id\":\"$context.requestId\",\"api_id\":\"$context.apiId\",\"resource_path\":\"$context.resourcePath\",\"resource_id\":\"$context.resourceId\",\"http_method\":\"$context.httpMethod\",\"source_ip\":\"$context.identity.sourceIp\",\"user-agent\":\"$context.identity.userAgent\",\"account_id\":\"$context.identity.accountId\",\"api_key\":\"$context.identity.apiKey\",\"caller\":\"$context.identity.caller\",\"user\":\"$context.identity.user\",\"user_arn\":\"$context.identity.userArn\"}"
   }
 }
-
