@@ -27,3 +27,8 @@ variable "account_id" {
   description = "Id de la Cuenta de AWS"
   type        = string
 }
+
+variable "lambda_function_name" {
+  description = "Name de la función Lambda"
+  type        = string
+}

@@ -10,7 +10,6 @@ resource "aws_lambda_function" "lambda_function" {
 
   role = aws_iam_role.lambda_execution_role.arn
 
-  # Agregar configuración de registro de CloudWatch
   tracing_config {
     mode = "Active"
   }
@@ -22,13 +21,11 @@ resource "aws_lambda_function" "lambda_function" {
   }
 }
 
-# Crear un nuevo recurso de grupo de registro de CloudWatch
 resource "aws_cloudwatch_log_group" "lambda_log_group" {
   name              = "/aws/lambda/${var.lambda_function_name}"
   retention_in_days = 30
 }
 
-# Crear una política de permisos para el grupo de registro
 resource "aws_iam_policy" "lambda_log_policy" {
   name        = "lambda_log_policy"
   description = "Allows Lambda function to write logs to CloudWatch"
@@ -51,7 +48,6 @@ resource "aws_iam_policy" "lambda_log_policy" {
 EOF
 }
 
-# Crear el rol de ejecución de Lambda
 resource "aws_iam_role" "lambda_execution_role" {
   name               = "lambda_execution_role"
   assume_role_policy = <<EOF
@@ -70,13 +66,11 @@ resource "aws_iam_role" "lambda_execution_role" {
 EOF
 }
 
-# Asociar la política de permisos al rol de ejecución de Lambda
 resource "aws_iam_role_policy_attachment" "lambda_log_policy_attachment" {
   policy_arn = aws_iam_policy.lambda_log_policy.arn
   role       = aws_iam_role.lambda_execution_role.name
 }
 
-# Asociar el grupo de registro a la función Lambda
 resource "aws_lambda_permission" "lambda_log_group_permission" {
   statement_id  = "AllowExecution"
   action        = "lambda:InvokeFunction"
@@ -89,9 +83,16 @@ resource "aws_lambda_permission" "api_gateway_permission" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.lambda_function.function_name
-  principal     = var.api_gateway_arn
-  source_arn    = aws_cloudwatch_log_group.lambda_log_group.arn
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${var.api_gateway_deployment_arn}/*/GET/"
 }
 
-# Obtener la región actual
+resource "aws_lambda_permission" "health_check_permission" {
+  statement_id  = "AllowHealthCheckInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda_function.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${var.api_gateway_deployment_arn}/*/GET/"
+}
+
 data "aws_region" "current" {}

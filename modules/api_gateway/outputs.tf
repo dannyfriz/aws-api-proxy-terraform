@@ -2,6 +2,6 @@ output "api_gateway_url" {
   value = aws_api_gateway_deployment.api_deployment.invoke_url
 }
 
-output "api_gateway_arn" {
-  value = aws_api_gateway_rest_api.api.arn
+output "api_gateway_deployment_arn" {
+  value = "arn:aws:execute-api:${var.region}:${var.account_id}:${aws_api_gateway_rest_api.api.id}/${aws_api_gateway_deployment.api_deployment.stage_name}"
 }

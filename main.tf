@@ -59,6 +59,7 @@ module "api_gateway" {
   region           = var.region
   account_id       = var.account_id
   lambda_function_arn = module.lambda_function.lambda_function_arn
+  lambda_function_name = module.lambda_function.lambda_function_name
 }
 
 module "lambda_function" {
@@ -69,7 +70,7 @@ module "lambda_function" {
   lambda_timeout            = var.lambda_timeout
   lambda_memory_size        = var.lambda_memory_size
   lambda_function_code_path = var.lambda_function_code_path
-  api_gateway_arn           = module.api_gateway.api_gateway_arn
+  api_gateway_deployment_arn = module.api_gateway.api_gateway_deployment_arn
   region                    = var.region
 }
 
