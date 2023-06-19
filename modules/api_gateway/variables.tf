@@ -23,12 +23,17 @@ variable "aws_region" {
   type        = string
 }
 
-variable "account_id" {
+variable "aws_account_id" {
   description = "Id de la Cuenta de AWS"
   type        = string
 }
 
 variable "lambda_function_name" {
   description = "Name de la función Lambda"
+  type        = string
+}
+
+variable "notification_email" {
+  description = "Notification_email"
   type        = string
 }

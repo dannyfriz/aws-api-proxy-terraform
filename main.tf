@@ -30,12 +30,13 @@ variable "lambda_handler" {}
 variable "lambda_timeout" {}
 variable "lambda_memory_size" {}
 variable "lambda_function_code_path" {}
-variable "account_id" {}
+variable "aws_account_id" {}
+variable "notification_email" {}
 
 # Carga los valores de las variables del archivo .tfvars como variables locales
 locals {
   aws_region                = var.aws_region
-  account_id                = var.account_id
+  aws_account_id                = var.aws_account_id
   api_name                  = var.api_name
   api_description           = var.api_description
   api_stage_name            = var.api_stage_name
@@ -49,6 +50,7 @@ locals {
   lambda_timeout            = var.lambda_timeout
   lambda_memory_size        = var.lambda_memory_size
   lambda_function_code_path = var.lambda_function_code_path
+  notification_email = var.notification_email
 }
 
 module "api_gateway" {
@@ -57,9 +59,10 @@ module "api_gateway" {
   api_description  = var.api_description
   api_stage_name   = var.api_stage_name
   aws_region           = var.aws_region
-  account_id       = var.account_id
   lambda_function_arn = module.lambda_function.lambda_function_arn
   lambda_function_name = module.lambda_function.lambda_function_name
+  notification_email = var.notification_email
+  aws_account_id = var.aws_account_id
 }
 
 module "lambda_function" {
