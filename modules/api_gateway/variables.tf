@@ -18,7 +18,7 @@ variable "lambda_function_arn" {
   type        = string
 }
 
-variable "region" {
+variable "aws_region" {
   description = "Region de la Cuenta de AWS"
   type        = string
 }

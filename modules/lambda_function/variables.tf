@@ -33,7 +33,7 @@ variable "api_gateway_deployment_arn" {
   type        = string
 }
 
-variable "region" {
+variable "aws_region" {
   description = "Región de la cuenta de AWS"
   type        = string
 }

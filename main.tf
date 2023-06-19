@@ -12,11 +12,11 @@ terraform {
 }
 
 provider "aws" {
-  region = var.region
+  region = var.aws_region
 }
 
 # Carga los valores de las variables del archivo .tfvars de uso global
-variable "region" {}
+variable "aws_region" {}
 variable "api_name" {}
 variable "api_description" {}
 variable "api_stage_name" {}
@@ -34,7 +34,7 @@ variable "account_id" {}
 
 # Carga los valores de las variables del archivo .tfvars como variables locales
 locals {
-  region                    = var.region
+  aws_region                = var.aws_region
   account_id                = var.account_id
   api_name                  = var.api_name
   api_description           = var.api_description
@@ -56,7 +56,7 @@ module "api_gateway" {
   api_name         = var.api_name
   api_description  = var.api_description
   api_stage_name   = var.api_stage_name
-  region           = var.region
+  aws_region           = var.aws_region
   account_id       = var.account_id
   lambda_function_arn = module.lambda_function.lambda_function_arn
   lambda_function_name = module.lambda_function.lambda_function_name
@@ -71,7 +71,7 @@ module "lambda_function" {
   lambda_memory_size        = var.lambda_memory_size
   lambda_function_code_path = var.lambda_function_code_path
   api_gateway_deployment_arn = module.api_gateway.api_gateway_deployment_arn
-  region                    = var.region
+  aws_region                 = var.aws_region
 }
 
 module "dynamodb" {
