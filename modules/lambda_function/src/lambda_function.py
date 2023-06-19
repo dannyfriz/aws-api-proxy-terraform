@@ -43,7 +43,7 @@ def lambda_handler(event, context):
         url = f"{signed_url}/categories/{category_id}"
         response = requests.get(url, headers=headers)
 
-        # Return the response from api.mercadolibre.com
+        # Return the response from api
         return {
             'statusCode': response.status_code,
             'body': response.text,

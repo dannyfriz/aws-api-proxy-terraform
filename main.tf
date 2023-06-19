@@ -16,6 +16,7 @@ provider "aws" {
 }
 
 # Variables
+variable "api_uri" {}
 variable "api_description" {}
 variable "api_name" {}
 variable "api_stage_name" {}
@@ -35,6 +36,7 @@ variable "lambda_timeout" {}
 # Módulo: api_gateway
 module "api_gateway" {
   source                    = "./modules/api_gateway"
+  api_uri                   = var.api_uri
   api_description           = var.api_description
   api_name                  = var.api_name
   api_stage_name            = var.api_stage_name

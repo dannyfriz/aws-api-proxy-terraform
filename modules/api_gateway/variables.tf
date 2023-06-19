@@ -37,3 +37,8 @@ variable "cloudwatch_log_group_arn" {
   description = "cloudwatch_log_group_arn"
   type        = string
 }
+
+variable "api_uri" {
+  description = "URI del dominio de la API Gateway"
+  type        = string
+}

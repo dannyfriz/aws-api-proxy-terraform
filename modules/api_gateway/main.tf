@@ -37,7 +37,7 @@ resource "aws_api_gateway_integration" "get_categories_proxy_integration" {
   http_method             = aws_api_gateway_method.get_categories_proxy_method.http_method
   integration_http_method = "GET"
   type                    = "HTTP_PROXY"
-  uri                     = "https://api.mercadolibre.com/categories/{proxy}"
+  uri                     = "https://${var.api_uri}/categories/{proxy}"
 
   request_parameters = {
     "integration.request.path.proxy" = "method.request.path.proxy"
