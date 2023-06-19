@@ -31,19 +31,26 @@ variable "lambda_handler" {}
 variable "lambda_memory_size" {}
 variable "lambda_runtime" {}
 variable "lambda_timeout" {}
-variable "notification_email" {}
 
 # Módulo: api_gateway
 module "api_gateway" {
-  source                 = "./modules/api_gateway"
-  api_description        = var.api_description
+  source                    = "./modules/api_gateway"
+  api_description           = var.api_description
+  api_name                  = var.api_name
+  api_stage_name            = var.api_stage_name
+  aws_account_id            = var.aws_account_id
+  aws_region                = var.aws_region
+  cloudwatch_log_group_arn  = module.cloudwatch.cloudwatch_log_group_arn
+  lambda_function_arn       = module.lambda_function.lambda_function_arn
+  lambda_function_name      = module.lambda_function.lambda_function_name
+}
+
+# Módulo: cloudwatch
+module "cloudwatch" {
+  source                 = "./modules/cloudwatch"
   api_name               = var.api_name
-  api_stage_name         = var.api_stage_name
   aws_account_id         = var.aws_account_id
   aws_region             = var.aws_region
-  lambda_function_arn    = module.lambda_function.lambda_function_arn
-  lambda_function_name   = module.lambda_function.lambda_function_name
-  notification_email     = var.notification_email
 }
 
 # Módulo: lambda_function

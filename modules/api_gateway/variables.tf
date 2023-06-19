@@ -18,22 +18,22 @@ variable "lambda_function_arn" {
   type        = string
 }
 
-variable "aws_region" {
-  description = "Region de la Cuenta de AWS"
-  type        = string
-}
-
-variable "aws_account_id" {
-  description = "Id de la Cuenta de AWS"
-  type        = string
-}
-
 variable "lambda_function_name" {
   description = "Name de la función Lambda"
   type        = string
 }
 
-variable "notification_email" {
-  description = "Notification_email"
+variable "aws_region" {
+  description = "Región de AWS"
+  type        = string
+}
+
+variable "aws_account_id" {
+  description = "ID de la cuenta de AWS"
+  type        = string
+}
+
+variable "cloudwatch_log_group_arn" {
+  description = "cloudwatch_log_group_arn"
   type        = string
 }
