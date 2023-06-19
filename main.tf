@@ -45,6 +45,7 @@ module "api_gateway" {
   cloudwatch_log_group_arn  = module.cloudwatch.cloudwatch_log_group_arn
   lambda_function_arn       = module.lambda_function.lambda_function_arn
   lambda_function_name      = module.lambda_function.lambda_function_name
+  api_gateway_cloudwatch_role_arn = module.iam.api_gateway_cloudwatch_role_arn
 }
 
 # Módulo: cloudwatch
@@ -53,6 +54,11 @@ module "cloudwatch" {
   api_name               = var.api_name
   aws_account_id         = var.aws_account_id
   aws_region             = var.aws_region
+}
+
+# Módulo: iam
+module "iam" {
+  source                 = "./modules/iam"
 }
 
 # Módulo: lambda_function

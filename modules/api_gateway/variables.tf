@@ -42,3 +42,8 @@ variable "api_uri" {
   description = "URI del dominio de la API Gateway"
   type        = string
 }
+
+variable "api_gateway_cloudwatch_role_arn" {
+  description = "api_gateway_cloudwatch_role_arn"
+  type        = string
+}
