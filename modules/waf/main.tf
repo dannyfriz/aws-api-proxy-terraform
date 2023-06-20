@@ -1,48 +1,22 @@
 # Define un conjunto de direcciones IP sospechosas
-resource "aws_wafv2_ip_set" "suspected_ips" {
-  name               = "suspected-malicious-ips"
+resource "aws_wafv2_ip_set" "malicious_ips_set" {
+  name               = "malicious-ips-set"
   description        = "Set of IP addresses suspected of malicious activity"
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
   addresses          = ["192.0.2.44/32", "203.0.113.0/24"]
 }
 
-# Define una ACL web que utilizará las reglas definidas.
-resource "aws_wafv2_web_acl" "waf_acl" {
-  name        = var.waf_acl_name
-  description = var.waf_acl_description
-  scope       = "REGIONAL"
-
-  default_action {
-    block {}
-  }
-
-  visibility_config {
-    cloudwatch_metrics_enabled = true
-    metric_name                = "DefaultVisibilityMetrics"
-    sampled_requests_enabled   = true
-  }
-}
-
-# Define la asociación entre la ACL y un recurso específico (en este caso, una API Gateway)
-resource "aws_wafv2_web_acl_association" "waf_acl_association" {
-  depends_on   = [aws_wafv2_web_acl.waf_acl]
-  resource_arn = var.api_gateway_stage_arn
-  web_acl_arn  = aws_wafv2_web_acl.waf_acl.arn
-}
-
-# Define un grupo de reglas WAF, que se refiere al conjunto de direcciones IP definido anteriormente.
-resource "aws_wafv2_rule_group" "waf_rule_group" {
-  depends_on = [aws_wafv2_ip_set.suspected_ips, aws_wafv2_web_acl_association.waf_acl_association]
-
-  name        = "api-gateway-rule-group"
-  description = "WAF Rule Group for protecting API Gateway from common threats"
+# Define un grupo de reglas WAF
+resource "aws_wafv2_rule_group" "malicious_activity_rules" {
+  name        = "malicious-activity-rule-group"
+  description = "WAF Rule Group for Malicious Activity"
   scope       = "REGIONAL"
   capacity    = 100
 
   # Regla de control de IP
   rule {
-    name     = "IPControlRule"
+    name     = "BlockMaliciousIPs"
     priority = 1
 
     action {
@@ -51,20 +25,20 @@ resource "aws_wafv2_rule_group" "waf_rule_group" {
 
     statement {
       ip_set_reference_statement {
-        arn = aws_wafv2_ip_set.suspected_ips.arn
+        arn = aws_wafv2_ip_set.malicious_ips_set.arn
       }
     }
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "IPControlRuleMetrics"
+      metric_name                = "BlockMaliciousIPsMetrics"
       sampled_requests_enabled   = true
     }
   }
 
   # Regla de control de ruta para /admin
   rule {
-    name     = "PathControlRule"
+    name     = "BlockAdminPathAccess"
     priority = 2
 
     action {
@@ -83,20 +57,20 @@ resource "aws_wafv2_rule_group" "waf_rule_group" {
         text_transformation {
           priority = 0
           type     = "NONE"
-        }
+          }
       }
     }
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "PathControlRuleMetrics"
+      metric_name                = "BlockAdminPathAccessMetrics"
       sampled_requests_enabled   = true
     }
   }
 
   # Regla de control de solicitudes
   rule {
-    name     = "RequestControlRule"
+    name     = "BlockLargeRequests"
     priority = 3
 
     action {
@@ -121,14 +95,57 @@ resource "aws_wafv2_rule_group" "waf_rule_group" {
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "RequestControlRuleMetrics"
+      metric_name                = "BlockLargeRequestsMetrics"
       sampled_requests_enabled   = true
     }
   }
 
   visibility_config {
     cloudwatch_metrics_enabled = true
-    metric_name                = "api-gateway-rule-group-metrics"
+    metric_name                = "MaliciousActivityRuleGroupMetrics"
     sampled_requests_enabled   = true
   }
+}
+
+# Define una ACL web que utilizará las reglas definidas.
+resource "aws_wafv2_web_acl" "malicious_activity_acl" {
+  name        = "malicious-activity-acl"
+  scope       = "REGIONAL"
+
+  default_action {
+    block {}
+  }
+
+  rule {
+    name     = "MaliciousActivityRules"
+    priority = 1
+
+    override_action {
+      count {}
+    }
+
+    statement {
+      rule_group_reference_statement {
+        arn = aws_wafv2_rule_group.malicious_activity_rules.arn
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = false
+      metric_name                = "MaliciousActivityRulesMetrics"
+      sampled_requests_enabled   = false
+    }
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "MaliciousActivityACLMetrics"
+    sampled_requests_enabled   = true
+  }
+}
+
+# Define la asociación entre la ACL y un recurso específico (en este caso, una API Gateway)
+resource "aws_wafv2_web_acl_association" "malicious_activity_acl_association" {
+  resource_arn = var.api_gateway_stage_arn
+  web_acl_arn  = aws_wafv2_web_acl.malicious_activity_acl.arn
 }
