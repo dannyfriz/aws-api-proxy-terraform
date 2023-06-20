@@ -38,30 +38,30 @@ variable "waf_rule_group_arn" {}
 
 # Módulo: api_gateway
 module "api_gateway" {
-  source                    = "./modules/api_gateway"
-  api_uri                   = var.api_uri
-  api_description           = var.api_description
-  api_name                  = var.api_name
-  api_stage_name            = var.api_stage_name
-  aws_account_id            = var.aws_account_id
-  aws_region                = var.aws_region
-  cloudwatch_log_group_arn  = module.cloudwatch.cloudwatch_log_group_arn
-  lambda_function_arn       = module.lambda_function.lambda_function_arn
-  lambda_function_name      = module.lambda_function.lambda_function_name
+  source                          = "./modules/api_gateway"
+  api_uri                         = var.api_uri
+  api_description                 = var.api_description
+  api_name                        = var.api_name
+  api_stage_name                  = var.api_stage_name
+  aws_account_id                  = var.aws_account_id
+  aws_region                      = var.aws_region
+  cloudwatch_log_group_arn        = module.cloudwatch.cloudwatch_log_group_arn
+  lambda_function_arn             = module.lambda_function.lambda_function_arn
+  lambda_function_name            = module.lambda_function.lambda_function_name
   api_gateway_cloudwatch_role_arn = module.iam.api_gateway_cloudwatch_role_arn
 }
 
 # Módulo: cloudwatch
 module "cloudwatch" {
-  source                 = "./modules/cloudwatch"
-  api_name               = var.api_name
-  aws_account_id         = var.aws_account_id
-  aws_region             = var.aws_region
+  source         = "./modules/cloudwatch"
+  api_name       = var.api_name
+  aws_account_id = var.aws_account_id
+  aws_region     = var.aws_region
 }
 
 # Módulo: iam
 module "iam" {
-  source                 = "./modules/iam"
+  source = "./modules/iam"
 }
 
 # Módulo: lambda_function
@@ -79,18 +79,18 @@ module "lambda_function" {
 
 # Módulo: dynamodb
 module "dynamodb" {
-  source                   = "./modules/dynamodb"
-  dynamodb_billing_mode    = var.dynamodb_billing_mode
-  dynamodb_read_capacity   = var.dynamodb_read_capacity
-  dynamodb_table_name      = var.dynamodb_table_name
-  dynamodb_write_capacity  = var.dynamodb_write_capacity
+  source                  = "./modules/dynamodb"
+  dynamodb_billing_mode   = var.dynamodb_billing_mode
+  dynamodb_read_capacity  = var.dynamodb_read_capacity
+  dynamodb_table_name     = var.dynamodb_table_name
+  dynamodb_write_capacity = var.dynamodb_write_capacity
 }
 
 # Módulo: waf
 module "waf" {
-  source                    = "./modules/waf"
-  waf_acl_name              = var.waf_acl_name
-  waf_acl_description       = var.waf_acl_description
-  waf_rule_group_arn        = var.waf_rule_group_arn
-  api_gateway_execution_arn = module.api_gateway.api_gateway_execution_arn
+  source                = "./modules/waf"
+  waf_acl_name          = var.waf_acl_name
+  waf_acl_description   = var.waf_acl_description
+  waf_rule_group_arn    = var.waf_rule_group_arn
+  api_gateway_stage_arn = module.api_gateway.api_gateway_stage_arn
 }

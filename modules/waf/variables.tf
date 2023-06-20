@@ -8,8 +8,8 @@ variable "waf_acl_description" {
   type        = string
 }
 
-variable "api_gateway_execution_arn" {
-  description = "ARN de la ejecución de API Gateway"
+variable "api_gateway_stage_arn" {
+  description = "ARN del escenario de API Gateway"
   type        = string
 }
 
