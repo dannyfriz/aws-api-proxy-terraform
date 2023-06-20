@@ -4,7 +4,7 @@ resource "aws_wafv2_ip_set" "malicious_ips_set" {
   description        = "Set of IP addresses suspected of malicious activity"
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
-  addresses          = ["192.0.2.44/32", "203.0.113.0/24"]
+  addresses          = ["192.0.2.44/32", "203.0.113.0/32"]
 }
 
 # Define un grupo de reglas WAF
@@ -31,7 +31,7 @@ resource "aws_wafv2_rule_group" "malicious_activity_rules" {
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "BlockMaliciousIPsMetrics"
+      metric_name                = "BlockMaliciousIPsMetricsFromIPSet"
       sampled_requests_enabled   = true
     }
   }
@@ -63,7 +63,7 @@ resource "aws_wafv2_rule_group" "malicious_activity_rules" {
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "BlockAdminPathAccessMetrics"
+      metric_name                = "BlockAdminPathAccessMetricsFromByteMatch"
       sampled_requests_enabled   = true
     }
   }
@@ -95,7 +95,7 @@ resource "aws_wafv2_rule_group" "malicious_activity_rules" {
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "BlockLargeRequestsMetrics"
+      metric_name                = "BlockLargeRequestsMetricsFromByteMatch"
       sampled_requests_enabled   = true
     }
   }
@@ -131,9 +131,9 @@ resource "aws_wafv2_web_acl" "malicious_activity_acl" {
     }
 
     visibility_config {
-      cloudwatch_metrics_enabled = false
-      metric_name                = "MaliciousActivityRulesMetrics"
-      sampled_requests_enabled   = false
+      cloudwatch_metrics_enabled = true
+      metric_name                = "MaliciousActivityRulesMetricsFromRuleGroup"
+      sampled_requests_enabled   = true
     }
   }
 
