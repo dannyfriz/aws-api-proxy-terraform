@@ -47,3 +47,13 @@ variable "api_gateway_cloudwatch_role_arn" {
   description = "api_gateway_cloudwatch_role_arn"
   type        = string
 }
+
+variable "api_gateway_api_domain_name" {
+  description = "api_gateway_api_domain_name"
+  type        = string
+}
+
+variable "api_gateway_acm_certificate" {
+  description = "api_gateway_acm_certificate"
+  type        = string
+}

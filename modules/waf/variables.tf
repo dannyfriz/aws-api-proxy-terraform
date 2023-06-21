@@ -17,3 +17,8 @@ variable "waf_rule_group_arn" {
   description = "ARN del grupo de reglas de WAF"
   type        = string
 }
+
+variable "api_gateway_api_domain_name" {
+  description = "api_gateway_api_domain_name"
+  type        = string
+}

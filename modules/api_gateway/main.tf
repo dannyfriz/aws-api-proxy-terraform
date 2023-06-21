@@ -1,3 +1,16 @@
+# Nombre de dominio personalizado para la API Gateway
+resource "aws_api_gateway_domain_name" "api_domain_name" {
+  domain_name = var.api_gateway_api_domain_name
+  certificate_arn = var.api_gateway_acm_certificate
+}
+
+# Mapeo de ruta base para asociar el nombre de dominio personalizado con la etapa de la API
+resource "aws_api_gateway_base_path_mapping" "api_base_path_mapping" {
+  api_id      = aws_api_gateway_rest_api.api.id
+  stage_name  = aws_api_gateway_stage.stage.stage_name
+  domain_name = aws_api_gateway_domain_name.api_domain_name.domain_name
+}
+
 # Recurso para la cuenta de API Gateway
 resource "aws_api_gateway_account" "api_gateway_account" {
   cloudwatch_role_arn = var.api_gateway_cloudwatch_role_arn
@@ -164,5 +177,18 @@ resource "aws_api_gateway_stage" "stage" {
   access_log_settings {
     destination_arn = var.cloudwatch_log_group_arn
     format = "{\"stage\":\"$context.stage\",\"request_id\":\"$context.requestId\",\"api_id\":\"$context.apiId\",\"resource_path\":\"$context.resourcePath\",\"resource_id\":\"$context.resourceId\",\"http_method\":\"$context.httpMethod\",\"source_ip\":\"$context.identity.sourceIp\",\"user-agent\":\"$context.identity.userAgent\",\"account_id\":\"$context.identity.accountId\",\"api_key\":\"$context.identity.apiKey\",\"caller\":\"$context.identity.caller\",\"user\":\"$context.identity.user\",\"user_arn\":\"$context.identity.userArn\"}"
+  }
+}
+
+# Respuesta 403
+resource "aws_api_gateway_gateway_response" "waf_403_response" {
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  status_code = "403"
+  response_type = "ACCESS_DENIED"
+  
+  response_templates = {
+    "application/json" = jsonencode({
+      message = "Access Denied: Request blocked by AWS WAF"
+    })
   }
 }
