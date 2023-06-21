@@ -90,6 +90,9 @@ module "lambda_function" {
   proxy_lambda_timeout       = var.proxy_lambda_timeout
   proxy_function_code_path   = var.proxy_function_code_path
   api_uri                    = var.api_uri
+  environment                = var.environment
+  name                       = var.name
+  project                    = var.project
 }
 
 # Module: waf
