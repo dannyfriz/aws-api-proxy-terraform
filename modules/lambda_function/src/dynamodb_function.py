@@ -9,31 +9,38 @@ DYNAMODB_TABLE_NAME = os.environ['DYNAMODB_TABLE_NAME']
 # Crear un cliente DynamoDB
 dynamodb = boto3.client('dynamodb')
 
+def write_items_to_dynamodb(items):
+    # Escribe una lista de elementos en DynamoDB utilizando operaciones de escritura por lotes.
+    request_items = {
+        DYNAMODB_TABLE_NAME: items
+    }
+    dynamodb.batch_write_item(RequestItems=request_items)
+
 def lambda_handler(event, context):
     try:
-        # Obtener información de la solicitud
-        http_method = event['httpMethod']
-        path = event['path']
-        headers = event['headers']
-        query_string_parameters = event['queryStringParameters']
-        body = event['body']
+        # Obtener la IP y el host de la solicitud
+        ip_address = event['requestContext']['identity']['sourceIp']
+        host = event['headers']['Host']
 
-        # Realizar operaciones adicionales según tus necesidades
-        # Por ejemplo, puedes procesar los datos de la solicitud, realizar validaciones, etc.
-
-        # Convertir la solicitud a JSON
+        # Crear una lista de elementos para insertar en DynamoDB
+        items = []
         request_json = json.dumps(event)
-
-        # Insertar el registro en DynamoDB
-        dynamodb.put_item(
-            TableName=DYNAMODB_TABLE_NAME,
-            Item={
-                'RequestId': {'S': context.aws_request_id},
-                'RequestData': {'S': request_json},
+        item = {
+            'PutRequest': {
+                'Item': {
+                    'RequestId': {'S': context.aws_request_id},
+                    'RequestData': {'S': request_json},
+                    'IPAddress': {'S': ip_address},
+                    'Host': {'S': host}
+                }
             }
-        )
+        }
+        items.append(item)
 
-        print("Registro insertado en DynamoDB")
+        # Escribir los elementos en DynamoDB utilizando operaciones de escritura por lotes
+        write_items_to_dynamodb(items)
+
+        print("Registros insertados en DynamoDB")
 
         return {
             'statusCode': 200,

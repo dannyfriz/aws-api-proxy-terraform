@@ -4,7 +4,7 @@ import urllib.parse
 import urllib.request
 import boto3
 
-# Obtener el nombre del domino de destino
+# Obtener el nombre del dominio de destino
 API_DOMAIN = os.environ['API_DOMAIN']
 
 # Obtener el nombre de la función de DynamoDB del entorno
@@ -56,6 +56,10 @@ def lambda_handler(event, context):
         # Read the response and decode it as JSON
         data = json.loads(response.read().decode())
         print('Response decoded as JSON')
+
+        # Agregar los atributos adicionales al diccionario de datos
+        data['IP_Address'] = os.environ['IP_ADDRESS']
+        data['Host'] = os.environ['HOST']
 
         # Invocar la función dynamodb_function y pasar los datos recibidos
         invoke_dynamodb_function(data)

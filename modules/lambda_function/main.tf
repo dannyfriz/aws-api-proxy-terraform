@@ -112,7 +112,8 @@ resource "aws_iam_policy" "lambda_dynamodb_write_policy" {
       "Action": [
         "dynamodb:PutItem",
         "dynamodb:UpdateItem",
-        "dynamodb:DeleteItem"
+        "dynamodb:DeleteItem",
+        "dynamodb:BatchWriteItem"
       ],
       "Resource": "${var.dynamodb_table_arn}"
     }
@@ -146,12 +147,15 @@ resource "aws_lambda_function" "proxy_lambda_function" {
   }
 
   environment {
-    variables = {
-      LOG_LEVEL            = "INFO"
-      API_DOMAIN           = var.api_uri
-      DYNAMODB_FUNCTION_NAME  = aws_lambda_function.dynamodb_function.function_name
-    }
+  variables = {
+    LOG_LEVEL               = "INFO"
+    API_DOMAIN              = var.api_uri
+    DYNAMODB_FUNCTION_NAME  = aws_lambda_function.dynamodb_function.function_name
+    IP_ADDRESS              = "$context.identity.sourceIp"
+    HOST                    = "$context.domainName"
   }
+}
+
 }
 
 # Recurso de grupo de registro de CloudWatch proxy_lambda_log_group
@@ -214,3 +218,5 @@ resource "aws_iam_role_policy_attachment" "proxy_lambda_invoke_policy_attachment
   policy_arn = aws_iam_policy.proxy_lambda_invoke_policy.arn
   role       = aws_iam_role.lambda_execution_role.name
 }
+
+

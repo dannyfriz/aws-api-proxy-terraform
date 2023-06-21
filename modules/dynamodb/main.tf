@@ -9,15 +9,29 @@ resource "aws_dynamodb_table" "api_proxy_requests_table" {
   }
 
   attribute {
+    name = "Timestamp"
+    type = "S"
+  }
+
+  attribute {
+    name = "IPAddress"
+    type = "S"
+  }
+
+  attribute {
+    name = "Host"
+    type = "S"
+  }
+
+  attribute {
     name = "RequestData"
     type = "S"
   }
 
   global_secondary_index {
-    name               = "RequestDataIndex"
-    hash_key           = "RequestData"
-    projection_type    = "INCLUDE"
-    non_key_attributes = ["RequestData"]
+    name               = "TimestampIndex"
+    hash_key           = "Timestamp"
+    projection_type    = "ALL"
     write_capacity     = var.dynamodb_write_capacity
     read_capacity      = var.dynamodb_read_capacity
   }
