@@ -3,7 +3,7 @@ import json
 import urllib.parse
 import urllib.request
 
-# Obtener el nombre del dominio de destino
+# Get the target domain name
 API_DOMAIN = os.environ['API_DOMAIN']
 
 def lambda_handler(event, context):
@@ -61,4 +61,3 @@ def lambda_handler(event, context):
             "headers": {"Content-Type": "application/json"},
             "body": json.dumps({"message": "Internal Server Error"})
         }
-
