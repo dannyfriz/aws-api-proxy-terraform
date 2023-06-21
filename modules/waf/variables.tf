@@ -1,24 +1,19 @@
-variable "waf_acl_name" {
-  description = "Nombre del ACL de WAF"
-  type        = string
-}
-
-variable "waf_acl_description" {
-  description = "Descripción del ACL de WAF"
+variable "api_gateway_api_domain_name" {
+  description = "Domain name of the API Gateway"
   type        = string
 }
 
 variable "api_gateway_stage_arn" {
-  description = "ARN del escenario de API Gateway"
+  description = "ARN of the API Gateway stage"
   type        = string
 }
 
-variable "waf_rule_group_arn" {
-  description = "ARN del grupo de reglas de WAF"
+variable "waf_acl_description" {
+  description = "Description of the WAF ACL"
   type        = string
 }
 
-variable "api_gateway_api_domain_name" {
-  description = "api_gateway_api_domain_name"
+variable "waf_acl_name" {
+  description = "Name of the WAF ACL"
   type        = string
 }
