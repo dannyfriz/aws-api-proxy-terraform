@@ -78,3 +78,8 @@ variable "proxy_function_code_path" {
   description = "Ruta al código de la función Lambda"
   type        = string
 }
+
+variable "api_uri" {
+  description = "api_uri"
+  type        = string
+}

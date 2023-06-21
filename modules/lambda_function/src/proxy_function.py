@@ -1,50 +1,54 @@
+import os
 import json
 import urllib.parse
 import urllib.request
 
-def lambda_handler(event, context):
-    print('Inicio de la función Lambda')
+# Obtener el nombre del domino de destino
+API_DOMAIN = os.environ['API_DOMAIN']
 
-    # Obtener la URL completa enviada por el cliente
+def lambda_handler(event, context):
+    print('Start of Lambda function')
+
+    # Get the complete URL sent by the client
     url = event["path"]
 
     try:
-        # Asegurarse de que la URL tenga el esquema completo
+        # Ensure that the URL has the complete scheme
         if not url.startswith("https://"):
             url = "https://" + url
 
-        # Descomponer la URL en sus componentes
+        # Parse the URL into its components
         parsed_url = urllib.parse.urlparse(url)
 
-        # Obtener la ruta de la URL
+        # Get the path of the URL
         path = parsed_url.path
 
-        # Obtener el último segmento de la ruta (ejemplo: MLM189580)
+        # Get the last segment of the path (example: MLM189580)
         category_id = path.split("/")[-1]
 
-        # Construir la nueva URL con el dominio y el último segmento de la ruta
+        # Build the new URL with the domain and the last segment of the path
         new_netloc = "api.mercadolibre.com"
-        modified_url = f"https://{new_netloc}/categories/{category_id}"
+        modified_url = f"https://{API_DOMAIN}/categories/{category_id}"
 
-        print(f'URL modificada: {modified_url}')
+        print(f'Modified URL: {modified_url}')
 
-        print('Realizando la solicitud GET')
-        # Realizar la solicitud GET a la URL modificada
+        print('Making the GET request')
+        # Make the GET request to the modified URL
         response = urllib.request.urlopen(modified_url)
 
-        # Leer la respuesta y decodificarla como JSON
+        # Read the response and decode it as JSON
         data = json.loads(response.read().decode())
-        print('Respuesta decodificada como JSON')
+        print('Response decoded as JSON')
 
-        # Devolver la respuesta como JSON
+        # Return the response as JSON
         return {
             "statusCode": 200,
             "headers": {"Content-Type": "application/json"},
             "body": json.dumps(data)
         }
     except urllib.error.HTTPError as e:
-        print(f'Error HTTP: {str(e)}')
-        # Capturar errores HTTP
+        print(f'HTTP Error: {str(e)}')
+        # Catch HTTP errors
         return {
             "statusCode": e.code,
             "headers": {"Content-Type": "application/json"},
@@ -52,9 +56,9 @@ def lambda_handler(event, context):
         }
     except Exception as e:
         print(f'Error: {str(e)}')
-        # Capturar otros errores
+        # Catch other errors
         return {
             "statusCode": 500,
             "headers": {"Content-Type": "application/json"},
-            "body": json.dumps({"message": "Error interno del servidor"})
+            "body": json.dumps({"message": "Internal Server Error"})
         }

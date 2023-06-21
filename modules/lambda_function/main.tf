@@ -145,7 +145,7 @@ resource "aws_lambda_function" "proxy_lambda_function" {
   environment {
     variables = {
       LOG_LEVEL = "INFO",
-      DYNAMODB_TABLE_NAME = var.dynamodb_table_name
+      API_DOMAIN  = var.api_uri
     }
   }
 }
