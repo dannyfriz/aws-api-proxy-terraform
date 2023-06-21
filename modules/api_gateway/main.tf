@@ -168,6 +168,9 @@ resource "aws_api_gateway_stage" "stage" {
   deployment_id = aws_api_gateway_deployment.api_deployment.id
   stage_name    = var.api_stage_name
 
+  cache_cluster_enabled = false # Habilitar en Productivo
+  cache_cluster_size    = "0.5"   # Tamaño del caché en GB, puede ser 0.5, 6.1, 13.5, 28.4, 58.2, 118, 237
+
   xray_tracing_enabled = true
 
   lifecycle {
@@ -177,6 +180,23 @@ resource "aws_api_gateway_stage" "stage" {
   access_log_settings {
     destination_arn = var.cloudwatch_log_group_arn
     format = "{\"stage\":\"$context.stage\",\"request_id\":\"$context.requestId\",\"api_id\":\"$context.apiId\",\"resource_path\":\"$context.resourcePath\",\"resource_id\":\"$context.resourceId\",\"http_method\":\"$context.httpMethod\",\"source_ip\":\"$context.identity.sourceIp\",\"user-agent\":\"$context.identity.userAgent\",\"account_id\":\"$context.identity.accountId\",\"api_key\":\"$context.identity.apiKey\",\"caller\":\"$context.identity.caller\",\"user\":\"$context.identity.user\",\"user_arn\":\"$context.identity.userArn\"}"
+  }
+}
+
+resource "aws_api_gateway_method_settings" "settings" {
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  stage_name  = aws_api_gateway_stage.stage.stage_name
+  method_path = "*/*"  # Ajusta esto según tus necesidades.
+
+  settings {
+    caching_enabled    = false    # Habilitar en Productivo
+    cache_ttl_in_seconds = 3600  # TTL del caché en segundos. Equivale a 1 hora.
+    cache_data_encrypted   = false # Habilitar en Productivo
+    data_trace_enabled = true
+    logging_level      = "INFO"
+    metrics_enabled    = true
+    throttling_burst_limit = 5000 # Mayor Capacidad solicitar ticket AWS Qoute
+    throttling_rate_limit  = 10000 # Mayor Capacidad solicitar ticket AWS Qoute
   }
 }
 
