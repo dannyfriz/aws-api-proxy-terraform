@@ -1,65 +1,57 @@
+import os
 import json
-import requests
 import boto3
-from botocore.signers import RequestSigner
+from botocore.exceptions import ClientError
 
-def get_api_gateway_url(event):
-    region = event['requestContext']['region']
-    api_id = event['requestContext']['apiId']
-    stage = event['requestContext']['stage']
+# Obtener el nombre de la tabla DynamoDB del entorno
+DYNAMODB_TABLE_NAME = os.environ['DYNAMODB_TABLE_NAME']
 
-    url = f"https://{api_id}.execute-api.{region}.amazonaws.com/{stage}"
-    return url
-
-def sign_request(url, region, service):
-    credentials = boto3.Session().get_credentials()
-    signer = RequestSigner(service, region, 'execute-api', 'v4', credentials)
-
-    headers = {}
-    signed_url = signer.generate_presigned_url(
-        method='GET',
-        url=url,
-        headers=headers,
-        region_name=region,
-        expires_in=60
-    )
-
-    return signed_url, headers
+# Crear un cliente DynamoDB
+dynamodb = boto3.client('dynamodb')
 
 def lambda_handler(event, context):
-    print("Received event: " + json.dumps(event))
-
     try:
-        # Extract the category ID from the path
-        category_id = event['pathParameters']['proxy']
+        # Obtener información de la solicitud
+        http_method = event['httpMethod']
+        path = event['path']
+        headers = event['headers']
+        query_string_parameters = event['queryStringParameters']
+        body = event['body']
 
-        # Create the URL for the API Gateway endpoint
-        api_gateway_url = get_api_gateway_url(event)
+        # Realizar operaciones adicionales según tus necesidades
+        # Por ejemplo, puedes procesar los datos de la solicitud, realizar validaciones, etc.
 
-        # Sign the request for the API Gateway endpoint
-        signed_url, headers = sign_request(api_gateway_url, 'us-east-1', 'execute-api')
+        # Convertir la solicitud a JSON
+        request_json = json.dumps(event)
 
-        # Forward the request to the signed URL
-        url = f"{signed_url}/categories/{category_id}"
-        response = requests.get(url, headers=headers)
-
-        # Return the response from api
-        return {
-            'statusCode': response.status_code,
-            'body': response.text,
-            'headers': {
-                'Content-Type': response.headers.get('Content-Type')
+        # Insertar el registro en DynamoDB
+        dynamodb.put_item(
+            TableName=DYNAMODB_TABLE_NAME,
+            Item={
+                'RequestId': {'S': context.aws_request_id},
+                'RequestData': {'S': request_json},
             }
+        )
+
+        print("Registro insertado en DynamoDB")
+
+        return {
+            'statusCode': 200,
+            'body': json.dumps('Hello from Lambda!')
         }
+    except ClientError as e:
+        error_message = e.response['Error']['Message']
+        print(f"Error al insertar el registro en DynamoDB: {error_message}")
 
-    except Exception as e:
-        print("Error:", str(e))
-
-        error_response = {
+        return {
             'statusCode': 500,
-            'body': 'An error occurred'
+            'body': json.dumps(f'Error: {error_message}')
         }
+    except Exception as e:
+        error_message = str(e)
+        print(f"Error en la función Lambda: {error_message}")
 
-        # Log the error response
-        print("Error Response: " + json.dumps(error_response))
-        return error_response
+        return {
+            'statusCode': 500,
+            'body': json.dumps(f'Error: {error_message}')
+        }

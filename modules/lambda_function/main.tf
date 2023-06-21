@@ -18,6 +18,7 @@ resource "aws_lambda_function" "lambda_function" {
   environment {
     variables = {
       LOG_LEVEL = "INFO"
+      DYNAMODB_TABLE_NAME = var.dynamodb_table_name
     }
   }
 }
@@ -94,4 +95,32 @@ resource "aws_lambda_permission" "api_gateway_permission" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.lambda_function.function_name
   principal     = "apigateway.amazonaws.com"
+}
+
+resource "aws_iam_policy" "lambda_dynamodb_write_policy" {
+  name        = "lambda_dynamodb_write_policy"
+  description = "Allows Lambda function to write to DynamoDB"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem"
+      ],
+      "Resource": "${var.dynamodb_table_arn}"
+    }
+  ]
+}
+EOF
+}
+
+# Asociar la política de permisos al rol de ejecución de Lambda
+resource "aws_iam_role_policy_attachment" "lambda_dynamodb_write_policy_attachment" {
+  policy_arn = aws_iam_policy.lambda_dynamodb_write_policy.arn
+  role       = aws_iam_role.lambda_execution_role.name
 }

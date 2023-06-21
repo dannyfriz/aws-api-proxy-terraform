@@ -37,3 +37,13 @@ variable "aws_region" {
   description = "Región de la cuenta de AWS"
   type        = string
 }
+
+variable "dynamodb_table_arn" {
+  description = "dynamodb_table_arn"
+  type        = string
+}
+
+variable "dynamodb_table_name" {
+  description = "dynamodb_table_name"
+  type        = string
+}

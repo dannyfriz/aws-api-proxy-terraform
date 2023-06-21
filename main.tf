@@ -79,6 +79,8 @@ module "lambda_function" {
   lambda_memory_size         = var.lambda_memory_size
   lambda_runtime             = var.lambda_runtime
   lambda_timeout             = var.lambda_timeout
+  dynamodb_table_arn         = module.dynamodb.dynamodb_table_arn
+  dynamodb_table_name        = module.dynamodb.dynamodb_table_name
 }
 
 # Módulo: dynamodb
