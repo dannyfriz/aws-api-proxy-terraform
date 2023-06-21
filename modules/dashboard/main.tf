@@ -122,6 +122,24 @@ resource "aws_cloudwatch_dashboard" "api_dashboard" {
           title = "Total Error Rate",
           period = 300
         }
+      },
+      {
+        type = "metric"
+        x = 6
+        y = 18
+        width = 6
+        height = 6
+        properties = {
+          metrics = [
+            ["AWS/ApiGateway", "Count", "ApiName", var.api_id, { "stat": "Sum", "period": 300 }],
+            ["AWS/Lambda", "Duration", "FunctionName", var.lambda_function_name, { "stat": "Average", "period": 300 }]
+          ],
+          view = "timeSeries",
+          stacked = false,
+          region = "us-east-1",
+          title = "API Requests and Lambda Duration",
+          period = 300
+        }
       }
       // Agrega más widgets para otras métricas aquí
     ]

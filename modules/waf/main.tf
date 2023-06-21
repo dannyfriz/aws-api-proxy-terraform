@@ -276,7 +276,6 @@ resource "aws_wafv2_web_acl" "malicious_activity_acl" {
   }
 }
 
-
 # Define la asociación entre la ACL y un recurso específico (en este caso, una API Gateway)
 resource "aws_wafv2_web_acl_association" "malicious_activity_acl_association" {
   resource_arn = var.api_gateway_stage_arn

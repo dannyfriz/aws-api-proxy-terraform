@@ -1,4 +1,4 @@
-# Rol IAM para la API Gateway con permisos para CloudWatch Logs
+# IAM Role for API Gateway with permissions for CloudWatch Logs
 resource "aws_iam_role" "api_gateway_cloudwatch_role" {
   name = "api-gateway-cloudwatch-role"
   assume_role_policy = <<EOF
@@ -16,9 +16,15 @@ resource "aws_iam_role" "api_gateway_cloudwatch_role" {
   ]
 }
 EOF
+
+  tags = {
+    Name        = "${var.name}-lambda-log-policy"
+    project     = var.project
+    environment = var.environment
+  }
 }
 
-# Permiso de política IAM para la API Gateway con acceso a CloudWatch Logs
+# IAM Role Policy Attachment for API Gateway with access to CloudWatch Logs
 resource "aws_iam_role_policy_attachment" "api_gateway_cloudwatch_policy_attachment" {
   role       = aws_iam_role.api_gateway_cloudwatch_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
