@@ -70,6 +70,7 @@ module "cloudwatch" {
 module "dashboard" {
   source         = "./modules/dashboard"
   api_id       = module.api_gateway.api_id
+  lambda_function_name =module.lambda_function.proxy_function_name
   dashboard_name  = var.dashboard_name
 }
 
