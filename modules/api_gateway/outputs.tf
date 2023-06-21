@@ -8,5 +8,5 @@ output "api_gateway_deployment_arn" {
 
 output "api_gateway_stage_arn" {
   description = "ARN del escenario de API Gateway"
-  value       = aws_api_gateway_stage.stage.arn
+  value       = aws_api_gateway_stage.api_stage.arn
 }

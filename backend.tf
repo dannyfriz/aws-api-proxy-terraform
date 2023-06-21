@@ -4,6 +4,5 @@ terraform {
     key            = "terraform.tfstate"
     region         = "us-east-1"
     encrypt        = true
-    dynamodb_table = "api_proxy_requests"
   }
 }
