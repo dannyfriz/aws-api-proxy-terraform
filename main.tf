@@ -37,6 +37,11 @@ variable "waf_acl_description" {}
 variable "waf_rule_group_arn" {}
 variable "api_gateway_api_domain_name" {}
 variable "api_gateway_acm_certificate" {}
+variable "proxy_lambda_function_name" {}
+variable "proxy_lambda_runtime" {}
+variable "proxy_lambda_handler" {}
+variable "proxy_lambda_timeout" {}
+variable "proxy_lambda_memory_size" {}
 
 # Módulo: api_gateway
 module "api_gateway" {
@@ -81,6 +86,11 @@ module "lambda_function" {
   lambda_timeout             = var.lambda_timeout
   dynamodb_table_arn         = module.dynamodb.dynamodb_table_arn
   dynamodb_table_name        = module.dynamodb.dynamodb_table_name
+  proxy_lambda_function_name = var.proxy_lambda_function_name
+  proxy_lambda_runtime = var.proxy_lambda_runtime
+  proxy_lambda_handler = var.proxy_lambda_handler
+  proxy_lambda_timeout = var.proxy_lambda_timeout
+  proxy_lambda_memory_size = var.proxy_lambda_memory_size
 }
 
 # Módulo: dynamodb

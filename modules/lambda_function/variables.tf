@@ -47,3 +47,29 @@ variable "dynamodb_table_name" {
   description = "dynamodb_table_name"
   type        = string
 }
+
+
+variable "proxy_lambda_function_name" {
+  description = "Nombre de la función Lambda"
+  type        = string
+}
+
+variable "proxy_lambda_runtime" {
+  description = "Tiempo de ejecución de la función Lambda"
+  type        = string
+}
+
+variable "proxy_lambda_handler" {
+  description = "Controlador de la función Lambda"
+  type        = string
+}
+
+variable "proxy_lambda_timeout" {
+  description = "Tiempo de espera de la función Lambda"
+  type        = number
+}
+
+variable "proxy_lambda_memory_size" {
+  description = "Tamaño de memoria asignado a la función Lambda"
+  type        = number
+}

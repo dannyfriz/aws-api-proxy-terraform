@@ -124,3 +124,55 @@ resource "aws_iam_role_policy_attachment" "lambda_dynamodb_write_policy_attachme
   policy_arn = aws_iam_policy.lambda_dynamodb_write_policy.arn
   role       = aws_iam_role.lambda_execution_role.name
 }
+
+
+
+data "archive_file" "proxy_lambda_zip" {
+  type        = "zip"
+  source_file = "${path.module}/src/proxy_lambda_function.py"
+  output_path = "${path.module}/src/proxy_lambda_function.zip"
+}
+
+resource "aws_lambda_function" "proxy_lambda_function" {
+  function_name    = var.proxy_lambda_function_name
+  runtime          = var.proxy_lambda_runtime
+  handler          = var.proxy_lambda_handler
+  timeout          = var.proxy_lambda_timeout
+  memory_size      = var.proxy_lambda_memory_size
+
+  filename         = data.archive_file.proxy_lambda_zip.output_path
+  source_code_hash = data.archive_file.proxy_lambda_zip.output_base64sha256
+
+  role = aws_iam_role.lambda_execution_role.arn
+
+  tracing_config {
+    mode = "Active"
+  }
+
+  environment {
+    variables = {
+      LOG_LEVEL = "INFO",
+      DYNAMODB_TABLE_NAME = var.dynamodb_table_name
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_group" "proxy_lambda_log_group" {
+  name              = "/aws/lambda/${var.proxy_lambda_function_name}"
+  retention_in_days = 30
+}
+
+resource "aws_lambda_permission" "proxy_lambda_log_group_permission" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.proxy_lambda_function.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = aws_cloudwatch_log_group.proxy_lambda_log_group.arn
+}
+
+resource "aws_lambda_permission" "proxy_api_gateway_permission" {
+  statement_id  = "AllowAPIGatewayInvocation"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.proxy_lambda_function.function_name
+  principal     = "apigateway.amazonaws.com"
+}
