@@ -73,3 +73,8 @@ variable "proxy_lambda_memory_size" {
   description = "Tamaño de memoria asignado a la función Lambda"
   type        = number
 }
+
+variable "proxy_function_code_path" {
+  description = "Ruta al código de la función Lambda"
+  type        = string
+}

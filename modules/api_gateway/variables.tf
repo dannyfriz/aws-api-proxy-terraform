@@ -57,3 +57,13 @@ variable "api_gateway_acm_certificate" {
   description = "api_gateway_acm_certificate"
   type        = string
 }
+
+variable "proxy_function_arn" {
+  description = "proxy_function_arn"
+  type        = string
+}
+
+variable "proxy_function_name" {
+  description = "proxy_function_name"
+  type        = string
+}

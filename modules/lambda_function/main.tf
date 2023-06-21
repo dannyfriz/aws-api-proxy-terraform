@@ -126,13 +126,6 @@ resource "aws_iam_role_policy_attachment" "lambda_dynamodb_write_policy_attachme
 }
 
 
-
-data "archive_file" "proxy_lambda_zip" {
-  type        = "zip"
-  source_file = "${path.module}/src/proxy_lambda_function.py"
-  output_path = "${path.module}/src/proxy_lambda_function.zip"
-}
-
 resource "aws_lambda_function" "proxy_lambda_function" {
   function_name    = var.proxy_lambda_function_name
   runtime          = var.proxy_lambda_runtime
@@ -140,8 +133,8 @@ resource "aws_lambda_function" "proxy_lambda_function" {
   timeout          = var.proxy_lambda_timeout
   memory_size      = var.proxy_lambda_memory_size
 
-  filename         = data.archive_file.proxy_lambda_zip.output_path
-  source_code_hash = data.archive_file.proxy_lambda_zip.output_base64sha256
+  filename         = var.proxy_function_code_path
+  source_code_hash = filebase64sha256(var.proxy_function_code_path)
 
   role = aws_iam_role.lambda_execution_role.arn
 
