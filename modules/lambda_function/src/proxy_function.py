@@ -2,27 +2,9 @@ import os
 import json
 import urllib.parse
 import urllib.request
-import boto3
 
 # Obtener el nombre del dominio de destino
 API_DOMAIN = os.environ['API_DOMAIN']
-
-# Obtener el nombre de la función de DynamoDB del entorno
-DYNAMODB_FUNCTION_NAME = os.environ['DYNAMODB_FUNCTION_NAME']
-
-# Crear un cliente Lambda
-lambda_client = boto3.client('lambda')
-
-def invoke_dynamodb_function(data):
-    payload = json.dumps(data)
-
-    response = lambda_client.invoke(
-        FunctionName=DYNAMODB_FUNCTION_NAME,
-        InvocationType='Event',
-        Payload=payload
-    )
-
-    # Verificar el código de respuesta en caso de que necesites manejar errores
 
 def lambda_handler(event, context):
     print('Start of Lambda function')
@@ -57,13 +39,6 @@ def lambda_handler(event, context):
         data = json.loads(response.read().decode())
         print('Response decoded as JSON')
 
-        # Agregar los atributos adicionales al diccionario de datos
-        data['IP_Address'] = os.environ['IP_ADDRESS']
-        data['Host'] = os.environ['HOST']
-
-        # Invocar la función dynamodb_function y pasar los datos recibidos
-        invoke_dynamodb_function(data)
-
         # Return the response as JSON
         return {
             "statusCode": 200,
@@ -86,3 +61,4 @@ def lambda_handler(event, context):
             "headers": {"Content-Type": "application/json"},
             "body": json.dumps({"message": "Internal Server Error"})
         }
+

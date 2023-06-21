@@ -13,16 +13,6 @@ variable "api_stage_name" {
   type        = string
 }
 
-variable "lambda_function_arn" {
-  description = "ARN de la función Lambda"
-  type        = string
-}
-
-variable "lambda_function_name" {
-  description = "Name de la función Lambda"
-  type        = string
-}
-
 variable "aws_region" {
   description = "Región de AWS"
   type        = string
@@ -65,5 +55,20 @@ variable "proxy_function_arn" {
 
 variable "proxy_function_name" {
   description = "proxy_function_name"
+  type        = string
+}
+
+variable "name" {
+  description = "name"
+  type        = string
+}
+
+variable "project" {
+  description = "project"
+  type        = string
+}
+
+variable "environment" {
+  description = "environment"
   type        = string
 }

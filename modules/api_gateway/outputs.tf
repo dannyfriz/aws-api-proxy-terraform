@@ -10,3 +10,8 @@ output "api_gateway_stage_arn" {
   description = "ARN del escenario de API Gateway"
   value       = aws_api_gateway_stage.api_stage.arn
 }
+
+output "api_id" {
+  description = "ARN del escenario de API Gateway"
+  value       = aws_api_gateway_rest_api.api.name
+}
