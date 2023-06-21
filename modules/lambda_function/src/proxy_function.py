@@ -2,9 +2,27 @@ import os
 import json
 import urllib.parse
 import urllib.request
+import boto3
 
 # Obtener el nombre del domino de destino
 API_DOMAIN = os.environ['API_DOMAIN']
+
+# Obtener el nombre de la función de DynamoDB del entorno
+DYNAMODB_FUNCTION_NAME = os.environ['DYNAMODB_FUNCTION_NAME']
+
+# Crear un cliente Lambda
+lambda_client = boto3.client('lambda')
+
+def invoke_dynamodb_function(data):
+    payload = json.dumps(data)
+
+    response = lambda_client.invoke(
+        FunctionName=DYNAMODB_FUNCTION_NAME,
+        InvocationType='Event',
+        Payload=payload
+    )
+
+    # Verificar el código de respuesta en caso de que necesites manejar errores
 
 def lambda_handler(event, context):
     print('Start of Lambda function')
@@ -27,7 +45,6 @@ def lambda_handler(event, context):
         category_id = path.split("/")[-1]
 
         # Build the new URL with the domain and the last segment of the path
-        new_netloc = "api.mercadolibre.com"
         modified_url = f"https://{API_DOMAIN}/categories/{category_id}"
 
         print(f'Modified URL: {modified_url}')
@@ -39,6 +56,9 @@ def lambda_handler(event, context):
         # Read the response and decode it as JSON
         data = json.loads(response.read().decode())
         print('Response decoded as JSON')
+
+        # Invocar la función dynamodb_function y pasar los datos recibidos
+        invoke_dynamodb_function(data)
 
         # Return the response as JSON
         return {

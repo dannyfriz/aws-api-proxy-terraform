@@ -26,7 +26,7 @@ variable "dynamodb_billing_mode" {}
 variable "dynamodb_read_capacity" {}
 variable "dynamodb_table_name" {}
 variable "dynamodb_write_capacity" {}
-variable "lambda_function_code_path" {}
+variable "dynamodb_function_code_path" {}
 variable "lambda_function_name" {}
 variable "lambda_handler" {}
 variable "lambda_memory_size" {}
@@ -81,7 +81,7 @@ module "lambda_function" {
   source                     = "./modules/lambda_function"
   api_gateway_deployment_arn = module.api_gateway.api_gateway_deployment_arn
   aws_region                 = var.aws_region
-  lambda_function_code_path  = var.lambda_function_code_path
+  dynamodb_function_code_path  = var.dynamodb_function_code_path
   lambda_function_name       = var.lambda_function_name
   lambda_handler             = var.lambda_handler
   lambda_memory_size         = var.lambda_memory_size

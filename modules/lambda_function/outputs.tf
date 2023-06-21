@@ -1,9 +1,9 @@
 output "lambda_function_arn" {
-  value = aws_lambda_function.lambda_function.invoke_arn
+  value = aws_lambda_function.dynamodb_function.invoke_arn
 }
 
 output "lambda_function_name" {
-  value = aws_lambda_function.lambda_function.function_name
+  value = aws_lambda_function.dynamodb_function.function_name
 }
 
 output "iam_execution_role_name" {

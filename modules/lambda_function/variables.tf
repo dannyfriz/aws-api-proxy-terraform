@@ -23,7 +23,7 @@ variable "lambda_memory_size" {
   type        = number
 }
 
-variable "lambda_function_code_path" {
+variable "dynamodb_function_code_path" {
   description = "Ruta al código de la función Lambda"
   type        = string
 }
