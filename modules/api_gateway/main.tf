@@ -1,6 +1,6 @@
 # Custom domain name for API Gateway
 resource "aws_api_gateway_domain_name" "api_domain_name" {
-  domain_name = var.api_gateway_api_domain_name
+  domain_name     = var.api_gateway_api_domain_name
   certificate_arn = var.api_gateway_acm_certificate
 
   tags = {
@@ -61,19 +61,18 @@ resource "aws_api_gateway_integration" "get_categories_proxy_integration" {
 
 # Initial deployment of API Gateway
 resource "aws_api_gateway_deployment" "api_deployment" {
-  rest_api_id = aws_api_gateway_rest_api.api.id
-  stage_name  = var.environment
+  rest_api_id      = aws_api_gateway_rest_api.api.id
+  stage_name       = var.environment
   stage_description = "Initial deployment"
 }
 
 # API Gateway Stage
 resource "aws_api_gateway_stage" "api_stage" {
-  deployment_id = aws_api_gateway_deployment.api_deployment.id
-  rest_api_id   = aws_api_gateway_rest_api.api.id
-  stage_name    = var.environment
-
-  cache_cluster_enabled = var.environment == "prod" ? true : false
-  cache_cluster_size    = var.environment == "prod" ? "0.5" : null
+  deployment_id           = aws_api_gateway_deployment.api_deployment.id
+  rest_api_id             = aws_api_gateway_rest_api.api.id
+  stage_name              = var.environment
+  cache_cluster_enabled   = var.environment == "prod" ? true : false
+  cache_cluster_size      = var.environment == "prod" ? "0.5" : null
 
   # Additional settings to enable X-Ray tracing and access logs.
   xray_tracing_enabled = true
@@ -98,7 +97,6 @@ resource "aws_api_gateway_base_path_mapping" "api_base_path_mapping" {
   api_id      = aws_api_gateway_rest_api.api.id
   stage_name  = aws_api_gateway_stage.api_stage.stage_name
   domain_name = aws_api_gateway_domain_name.api_domain_name.domain_name
-
 }
 
 # Permission for API Gateway to invoke Lambda function
@@ -117,9 +115,9 @@ resource "aws_api_gateway_method_settings" "settings_get" {
   method_path = "categories/GET"
 
   settings {
-    logging_level = "INFO"
-    data_trace_enabled = true
-    metrics_enabled = true
+    logging_level       = "INFO"
+    data_trace_enabled  = true
+    metrics_enabled     = true
   }
 }
 
@@ -130,8 +128,8 @@ resource "aws_api_gateway_method_settings" "settings_post" {
   method_path = "categories/POST"
 
   settings {
-    logging_level = "INFO"
-    data_trace_enabled = true
-    metrics_enabled = true
+    logging_level       = "INFO"
+    data_trace_enabled  = true
+    metrics_enabled     = true
   }
 }
