@@ -1,4 +1,4 @@
-# Define un conjunto de direcciones IP sospechosas
+# Define a set of suspicious IP addresses
 resource "aws_wafv2_ip_set" "malicious_ips_set" {
   name               = "malicious-ips-set"
   description        = "Set of IP addresses suspected of malicious activity"
@@ -7,14 +7,14 @@ resource "aws_wafv2_ip_set" "malicious_ips_set" {
   addresses          = ["192.0.2.44/32", "203.0.113.0/32"]
 }
 
-# Define un grupo de reglas WAF para la actividad maliciosa
+# Define a WAF rule group for malicious activity
 resource "aws_wafv2_rule_group" "malicious_activity_rules" {
   name        = "malicious-activity-rule-group"
   description = "WAF Rule Group for Malicious Activity"
   scope       = "REGIONAL"
   capacity    = 100
 
-  # Regla de control de IP
+  # IP control rule
   rule {
     name     = "BlockMaliciousIPs"
     priority = 1
@@ -36,7 +36,7 @@ resource "aws_wafv2_rule_group" "malicious_activity_rules" {
     }
   }
 
-  # Regla de control de ruta para /admin
+  # Path control rule for /admin
   rule {
     name     = "BlockAdminPathAccess"
     priority = 2
@@ -57,7 +57,7 @@ resource "aws_wafv2_rule_group" "malicious_activity_rules" {
         text_transformation {
           priority = 0
           type     = "NONE"
-          }
+        }
       }
     }
 
@@ -68,7 +68,7 @@ resource "aws_wafv2_rule_group" "malicious_activity_rules" {
     }
   }
 
-  # Regla de control de solicitudes
+  # Request control rule
   rule {
     name     = "BlockLargeRequests"
     priority = 3
@@ -107,14 +107,14 @@ resource "aws_wafv2_rule_group" "malicious_activity_rules" {
   }
 }
 
-# Define un grupo de reglas WAF para permitir cierta actividad
+# Define a WAF rule group for allowed activity
 resource "aws_wafv2_rule_group" "allow_activity_rules" {
   name        = "allow-activity-rule-group"
   description = "WAF Rule Group for Allowed Activity"
   scope       = "REGIONAL"
   capacity    = 100
 
-  # Regla para permitir tráfico al API Gateway especificado
+  # Rule to allow traffic to specified API Gateway
   rule {
     name     = "AllowSpecificAPIGateway"
     priority = 1
@@ -146,9 +146,9 @@ resource "aws_wafv2_rule_group" "allow_activity_rules" {
     }
   }
 
-  # Regla para permitir tráfico de api.mercadolibre.com
+  # Rule to allow traffic from a specific domain
   rule {
-    name     = "AllowMercadoLibreAPI"
+    name     = "AllowSpecificAPI"
     priority = 2
 
     action {
@@ -163,7 +163,7 @@ resource "aws_wafv2_rule_group" "allow_activity_rules" {
           }
         }
         positional_constraint = "CONTAINS"
-        search_string         = "api.mercadolibre.com"
+        search_string         = var.api_uri
         text_transformation {
           priority = 0
           type     = "NONE"
@@ -173,7 +173,7 @@ resource "aws_wafv2_rule_group" "allow_activity_rules" {
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "AllowMercadoLibreAPIMetrics"
+      metric_name                = "AllowSpecificAPIMetrics"
       sampled_requests_enabled   = true
     }
   }
@@ -185,7 +185,7 @@ resource "aws_wafv2_rule_group" "allow_activity_rules" {
   }
 }
 
-# Define una ACL web que utilizará las reglas definidas.
+# Define a web ACL that will use the defined rules
 resource "aws_wafv2_web_acl" "malicious_activity_acl" {
   name        = "malicious-activity-acl"
   scope       = "REGIONAL"
@@ -194,9 +194,9 @@ resource "aws_wafv2_web_acl" "malicious_activity_acl" {
     block {}
   }
 
-  #Rule to allow traffic to "api.ikigaisolutions.cl"
+  # Rule to allow traffic to a specific domain origin
   rule {
-    name     = "AllowIkigaiSolutionsAPI"
+    name     = "AllowSpecificOriginAPI"
     priority = 1
 
     action {
@@ -221,12 +221,12 @@ resource "aws_wafv2_web_acl" "malicious_activity_acl" {
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "AllowIkigaiSolutionsAPIMetrics"
+      metric_name                = "AllowSpecificOriginAPIMetrics"
       sampled_requests_enabled   = true
     }
   }
 
-  # Rules Group
+  # Rule Group
   rule {
     name     = "AllowActivityRules"
     priority = 2
@@ -276,8 +276,91 @@ resource "aws_wafv2_web_acl" "malicious_activity_acl" {
   }
 }
 
-# Define la asociación entre la ACL y un recurso específico (en este caso, una API Gateway)
+# Define the association between the ACL and a specific resource (in this case, an API Gateway)
 resource "aws_wafv2_web_acl_association" "malicious_activity_acl_association" {
   resource_arn = var.api_gateway_stage_arn
   web_acl_arn  = aws_wafv2_web_acl.malicious_activity_acl.arn
+}
+resource "aws_s3_bucket" "waf_logs_bucket" {
+  bucket = "waf-logs-bucket-${var.environment}"
+
+  tags = {
+    environment = var.environment
+    name        = var.name
+    project     = var.project
+  }
+}
+
+resource "random_id" "bucket_suffix" {
+  byte_length = 4
+}
+
+resource "aws_s3_bucket" "waf_logs_bucket_s3" {
+  bucket = "aws-waf-logs-${random_id.bucket_suffix.hex}"
+
+  tags = {
+    environment = var.environment
+    name        = var.name
+    project     = var.project
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "waf_logs_bucket_lifecycle" {
+  bucket = aws_s3_bucket.waf_logs_bucket_s3.id
+
+  rule {
+    id      = "waf-logs-lifecycle-rule"
+    status  = "Enabled"
+
+    noncurrent_version_transition {
+      newer_noncurrent_versions = null
+      noncurrent_days           = 30
+      storage_class             = "STANDARD_IA"
+    }
+
+    noncurrent_version_transition {
+      newer_noncurrent_versions = null
+      noncurrent_days           = 60
+      storage_class             = "GLACIER"
+    }
+
+    noncurrent_version_expiration {
+      newer_noncurrent_versions = null
+      noncurrent_days           = 90
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_group" "waf_logs" {
+  name              = "aws-waf-logs-${var.environment}"
+  retention_in_days = 30
+}
+
+resource "aws_wafv2_web_acl_logging_configuration" "log_config" {
+  log_destination_configs = [aws_s3_bucket.waf_logs_bucket_s3.arn]
+  resource_arn            = aws_wafv2_web_acl.malicious_activity_acl.arn
+
+  redacted_fields {
+    single_header {
+      name = "user-agent"
+    }
+  }
+
+  redacted_fields {
+    single_header {
+      name = "referer"
+    }
+  }
+
+  redacted_fields {
+    single_header {
+      name = "cookie"
+    }
+  }
+
+  redacted_fields {
+    single_header {
+      name = "authorization"
+    }
+  }
 }

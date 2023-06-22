@@ -36,6 +36,7 @@ variable "proxy_lambda_runtime" {}
 variable "proxy_lambda_timeout" {}
 variable "waf_acl_description" {}
 variable "waf_acl_name" {}
+variable "email_control_center" {}
 
 # Module: api_gateway
 module "api_gateway" {
@@ -71,6 +72,7 @@ module "dashboard" {
   api_id                = module.api_gateway.api_id
   dashboard_name        = var.dashboard_name
   lambda_function_name  = module.lambda_function.proxy_function_name
+  email_control_center  = var.email_control_center
 }
 
 # Module: iam
@@ -105,5 +107,9 @@ module "waf" {
   api_gateway_stage_arn       = module.api_gateway.api_gateway_stage_arn
   waf_acl_description         = var.waf_acl_description
   waf_acl_name                = var.waf_acl_name
+  api_uri                     = var.api_uri
+  environment                 = var.environment
+  name                        = var.name
+  project                     = var.project
   depends_on                  = [module.api_gateway]
 }

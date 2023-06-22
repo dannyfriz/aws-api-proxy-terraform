@@ -12,3 +12,8 @@ variable "lambda_function_name" {
   description = "The name of the Lambda function"
   type        = string
 }
+
+variable "email_control_center" {
+  description = "email for sns topic"
+  type        = string
+}

@@ -17,3 +17,23 @@ variable "waf_acl_name" {
   description = "Name of the WAF ACL"
   type        = string
 }
+
+variable "name" {
+  description = "Name"
+  type        = string
+}
+
+variable "project" {
+  description = "Project"
+  type        = string
+}
+
+variable "environment" {
+  description = "Environment"
+  type        = string
+}
+
+variable "api_uri" {
+  description = "API URI"
+  type        = string
+}
