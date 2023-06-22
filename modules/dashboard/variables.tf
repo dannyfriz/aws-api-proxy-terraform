@@ -9,6 +9,6 @@ variable "api_id" {
 }
 
 variable "lambda_function_name" {
-  description = "The ID of the API for which to create the dashboard"
+  description = "The name of the Lambda function"
   type        = string
 }
