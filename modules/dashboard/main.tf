@@ -16,7 +16,7 @@ resource "aws_cloudwatch_dashboard" "api_dashboard" {
           view = "timeSeries",
           stacked = false,
           region = "us-east-1",
-          title = "API Requests",
+          title = "API Requests",    // Widget displaying API requests metric
           period = 300
         }
       },
@@ -33,7 +33,7 @@ resource "aws_cloudwatch_dashboard" "api_dashboard" {
           view = "timeSeries",
           stacked = false,
           region = "us-east-1",
-          title = "4XX Errors",
+          title = "4XX Errors",    // Widget displaying 4XX errors metric
           period = 300
         }
       },
@@ -50,7 +50,7 @@ resource "aws_cloudwatch_dashboard" "api_dashboard" {
           view = "timeSeries",
           stacked = false,
           region = "us-east-1",
-          title = "5XX Errors",
+          title = "5XX Errors",    // Widget displaying 5XX errors metric
           period = 300
         }
       },
@@ -67,7 +67,7 @@ resource "aws_cloudwatch_dashboard" "api_dashboard" {
           view = "timeSeries",
           stacked = false,
           region = "us-east-1",
-          title = "Latency",
+          title = "Latency",    // Widget displaying latency metric
           period = 300
         }
       },
@@ -84,7 +84,7 @@ resource "aws_cloudwatch_dashboard" "api_dashboard" {
           view = "timeSeries",
           stacked = false,
           region = "us-east-1",
-          title = "Integration Latency",
+          title = "Integration Latency",    // Widget displaying integration latency metric
           period = 300
         }
       },
@@ -102,7 +102,7 @@ resource "aws_cloudwatch_dashboard" "api_dashboard" {
           view = "timeSeries",
           stacked = false,
           region = "us-east-1",
-          title = "Cache Hits and Misses",
+          title = "Cache Hits and Misses",    // Widget displaying cache hits and misses metrics
           period = 300
         }
       },
@@ -119,7 +119,7 @@ resource "aws_cloudwatch_dashboard" "api_dashboard" {
           view = "timeSeries",
           stacked = false,
           region = "us-east-1",
-          title = "Total Error Rate",
+          title = "Total Error Rate",    // Widget displaying total error rate metric
           period = 300
         }
       },
@@ -137,11 +137,11 @@ resource "aws_cloudwatch_dashboard" "api_dashboard" {
           view = "timeSeries",
           stacked = false,
           region = "us-east-1",
-          title = "API Requests and Lambda Duration",
+          title = "API Requests and Lambda Duration",    // Widget displaying API requests and Lambda duration metrics
           period = 300
         }
       }
-      // Agrega más widgets para otras métricas aquí
+      // Add more widgets for other metrics here
     ]
   })
 }

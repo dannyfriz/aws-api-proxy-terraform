@@ -1,11 +1,11 @@
-# Grupo de logs en CloudWatch para la API Gateway
+# CloudWatch log group for API Gateway
 resource "aws_cloudwatch_log_group" "access_logs" {
   name = "/aws/apigateway/${var.api_name}-access-logs"
 
   retention_in_days = 7
 }
 
-# Política de recursos de logs en CloudWatch para la API Gateway
+# CloudWatch log resource policy for API Gateway
 resource "aws_cloudwatch_log_resource_policy" "log_resource_policy" {
   policy_name = "APIGatewayLogResourcePolicy"
 

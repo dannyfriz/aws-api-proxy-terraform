@@ -1,14 +1,14 @@
 variable "aws_region" {
-  description = "Región de AWS"
+  description = "AWS region"
   type        = string
 }
 
 variable "aws_account_id" {
-  description = "ID de la cuenta de AWS"
+  description = "AWS account ID"
   type        = string
 }
 
 variable "api_name" {
-  description = "Nombre de la API"
+  description = "API name"
   type        = string
 }
