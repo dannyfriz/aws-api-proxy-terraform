@@ -76,6 +76,9 @@ module "dashboard" {
 # Module: iam
 module "iam" {
   source = "./modules/iam"
+    environment                = var.environment
+  name                       = var.name
+  project                    = var.project
 }
 
 # Module: lambda_function
