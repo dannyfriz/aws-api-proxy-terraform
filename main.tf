@@ -69,14 +69,14 @@ module "cloudwatch" {
 module "dashboard" {
   source                = "./modules/dashboard"
   api_id                = module.api_gateway.api_id
-  lambda_function_name  = module.lambda_function.proxy_function_name
   dashboard_name        = var.dashboard_name
+  lambda_function_name  = module.lambda_function.proxy_function_name
 }
 
 # Module: iam
 module "iam" {
   source = "./modules/iam"
-    environment                = var.environment
+  environment                = var.environment
   name                       = var.name
   project                    = var.project
 }
@@ -85,25 +85,25 @@ module "iam" {
 module "lambda_function" {
   source                     = "./modules/lambda_function"
   api_gateway_deployment_arn = module.api_gateway.api_gateway_deployment_arn
+  api_uri                    = var.api_uri
   aws_region                 = var.aws_region
+  environment                = var.environment
+  name                       = var.name
+  project                    = var.project
+  proxy_function_code_path   = var.proxy_function_code_path
   proxy_lambda_function_name = var.proxy_lambda_function_name
   proxy_lambda_handler       = var.proxy_lambda_handler
   proxy_lambda_memory_size   = var.proxy_lambda_memory_size
   proxy_lambda_runtime       = var.proxy_lambda_runtime
   proxy_lambda_timeout       = var.proxy_lambda_timeout
-  proxy_function_code_path   = var.proxy_function_code_path
-  api_uri                    = var.api_uri
-  environment                = var.environment
-  name                       = var.name
-  project                    = var.project
 }
 
 # Module: waf
 module "waf" {
   source                      = "./modules/waf"
-  waf_acl_description         = var.waf_acl_description
-  waf_acl_name                = var.waf_acl_name
   api_gateway_api_domain_name = var.api_gateway_api_domain_name
   api_gateway_stage_arn       = module.api_gateway.api_gateway_stage_arn
+  waf_acl_description         = var.waf_acl_description
+  waf_acl_name                = var.waf_acl_name
   depends_on                  = [module.api_gateway]
 }
